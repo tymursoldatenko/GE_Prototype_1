@@ -49,6 +49,15 @@ namespace Gamekit3D
             m_Rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
 
             m_FollowNavmeshAgent = true;
+            /*if (m_Animator.avatar != null) return;
+            foreach (Animator a in GetComponentsInChildren<Animator>())
+            {
+                if (a != m_Animator)
+                {
+                    m_Animator.avatar = a.avatar;
+                    a.enabled = false;
+                }
+            }*/
         }
 
         private void FixedUpdate()

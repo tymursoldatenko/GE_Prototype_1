@@ -54,7 +54,7 @@ namespace Gamekit3D
 
             originalPosition = transform.position;
 
-            meleeWeapon.SetOwner(gameObject);
+            //meleeWeapon.SetOwner(gameObject);
 
             m_Controller.animator.Play(hashIdleState, 0, Random.value);
 

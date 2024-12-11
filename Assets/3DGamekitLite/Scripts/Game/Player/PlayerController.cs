@@ -146,7 +146,7 @@ namespace Gamekit3D
             m_Animator = GetComponent<Animator>();
             m_CharCtrl = GetComponent<CharacterController>();
 
-            meleeWeapon.SetOwner(gameObject);
+            //meleeWeapon.SetOwner(gameObject);
 
             s_Instance = this;
         }
@@ -169,7 +169,7 @@ namespace Gamekit3D
         // Called automatically by Unity whenever the script is disabled.
         void OnDisable()
         {
-            m_Damageable.onDamageMessageReceivers.Remove(this);
+            //m_Damageable.onDamageMessageReceivers.Remove(this);
 
             for (int i = 0; i < m_Renderers.Length; ++i)
             {
