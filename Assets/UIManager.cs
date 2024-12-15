@@ -6,6 +6,8 @@ using System.Collections;
 public class UIManager : MonoBehaviour
 {
     public GameObject mainMenuCanvas;  // √лавное меню
+    public GameObject gameCamera;  
+    public GameObject mainCamera;  
     public GameObject gameCanvas;     // »гровое поле
     public GameObject pauseCanvas;    // Ёкран паузы
     public GameObject gameOverCanvas; // Ёкран окончани€ игры
@@ -15,7 +17,6 @@ public class UIManager : MonoBehaviour
 
     void Start()
     {
-        Time.timeScale = 0;
         ShowMainMenu();
     }
 
@@ -38,7 +39,10 @@ public class UIManager : MonoBehaviour
     // ѕоказать главное меню
     public void ShowMainMenu()
     {
+        Time.timeScale = 0;
         mainMenuCanvas.SetActive(true);
+        mainCamera.SetActive(true);
+        gameCamera.SetActive(false);
         gameCanvas.SetActive(false);
         pauseCanvas.SetActive(false);
         gameOverCanvas.SetActive(false);
@@ -48,6 +52,8 @@ public class UIManager : MonoBehaviour
     public void StartGame()
     {
         mainMenuCanvas.SetActive(false);
+        gameCamera.SetActive(true);
+        mainCamera.SetActive(false);
         StartCoroutine(CountdownToStart());
     }
 
