@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Car
   - ResetDriftCollision
+  - Destroyable
+  - Street Light
   layers:
   - Default
   - TransparentFX

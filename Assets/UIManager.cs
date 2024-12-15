@@ -1,105 +1,118 @@
+using System.Collections; // Это важно для IEnumerator
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using System.Collections;
 
 public class UIManager : MonoBehaviour
 {
-    public GameObject mainMenuCanvas;  // Главное меню
-    public GameObject gameCamera;  
-    public GameObject mainCamera;  
-    public GameObject gameCanvas;     // Игровое поле
-    public GameObject pauseCanvas;    // Экран паузы
-    public GameObject gameOverCanvas; // Экран окончания игры
-    public Text countdownText;        // Текст для обратного отсчёта
+    public GameObject gameCamera;
+    public GameObject mainCamera;
+    public GameObject mainMenu;      // Главный экран
+    public GameObject countdownUI;  // Экран отсчёта
+    public GameObject pauseMenu;    // Экран паузы
+    public GameObject gameOverMenu; // Экран окончания игры
+    public Text countdownText;      // Текст для отсчёта
 
-    private bool isPaused = false;    // Флаг паузы
+    private bool isGamePaused = false; // Флаг паузы
+    public static bool isGameStarted = false; // Флаг начала игры
+    public static UIManager Instance;
+
+    void Awake()
+    {
+        // Проверяем, если экземпляр уже существует, то удаляем этот компонент
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+        }
+        else
+        {
+            Instance = this; // Устанавливаем текущий экземпляр как Instance
+            DontDestroyOnLoad(gameObject); // Убедимся, что UIManager не уничтожится при смене сцен
+        }
+    }
+
 
     void Start()
     {
-        ShowMainMenu();
-    }
+        // Устанавливаем начальные состояния
+        mainMenu.SetActive(true);
+        mainCamera.SetActive(true);
+        gameCamera.SetActive(false);
+        countdownUI.SetActive(false);
+        pauseMenu.SetActive(false);
+        gameOverMenu.SetActive(false);
 
+        isGameStarted = false; // Игра не началась
+    }
     void Update()
     {
         // Проверяем нажатие клавиши Esc
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (!isPaused)
+            if (!isGamePaused)
             {
-                PauseGame();
+                OnPauseButtonClicked();
             }
             else
             {
-                ResumeGame();
+                OnResumeButtonClicked();
             }
         }
     }
 
-    // Показать главное меню
-    public void ShowMainMenu()
-    {
-        Time.timeScale = 0;
-        mainMenuCanvas.SetActive(true);
-        mainCamera.SetActive(true);
-        gameCamera.SetActive(false);
-        gameCanvas.SetActive(false);
-        pauseCanvas.SetActive(false);
-        gameOverCanvas.SetActive(false);
-    }
 
-    // Начать игру
-    public void StartGame()
+    public void OnStartButtonClicked()
     {
-        mainMenuCanvas.SetActive(false);
-        gameCamera.SetActive(true);
+        mainMenu.SetActive(false); // Скрываем главное меню
         mainCamera.SetActive(false);
-        StartCoroutine(CountdownToStart());
+        gameCamera.SetActive(true);
+        StartCoroutine(StartCountdown()); // Запускаем отсчёт
     }
 
-    // Корутина для обратного отсчёта перед стартом игры
-    private IEnumerator CountdownToStart()
+    private IEnumerator StartCountdown()
     {
-        gameCanvas.SetActive(true);  // Показать игровой экран
+        countdownUI.SetActive(true);
 
         for (int i = 3; i > 0; i--)
         {
-            countdownText.text = i.ToString(); // Отобразить текущее число
-            yield return new WaitForSeconds(1); // Ждать 1 секунду
+            countdownText.text = i.ToString(); // Показать текущее число
+            yield return new WaitForSeconds(1f); // Ждать 1 секунду
         }
 
-        countdownText.text = ""; // Очистить текст после отсчёта
-        Time.timeScale = 1;
-        // Здесь можно добавить код для запуска игры
+        countdownText.text = "Go!";
+        yield return new WaitForSeconds(1f);
+        countdownText.text = "";
+
+        //countdownUI.SetActive(false); // Скрываем экран отсчёта
+        isGameStarted = true; // Игра началась
     }
 
-    // Пауза игры
-    public void PauseGame()
+    public void OnPauseButtonClicked()
     {
-        isPaused = true;
-        Time.timeScale = 0; // Останавливаем время
-        pauseCanvas.SetActive(true); // Показать экран паузы
+        isGamePaused = true;
+        pauseMenu.SetActive(true);
+        Time.timeScale = 0f; // Останавливаем время
     }
 
-    // Продолжить игру
-    public void ResumeGame()
+    public void OnResumeButtonClicked()
     {
-        isPaused = false;
-        Time.timeScale = 1; // Возобновляем время
-        pauseCanvas.SetActive(false); // Скрыть экран паузы
+        isGamePaused = false;
+        pauseMenu.SetActive(false);
+        Time.timeScale = 1f; // Возобновляем время
     }
 
-    // Перезапустить игру
-    public void RestartGame()
+    public void OnRestartButtonClicked()
     {
-        Time.timeScale = 1; // Возобновляем время на случай паузы
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name); // Перезагружаем текущую сцену
+        Time.timeScale = 1f; // Восстанавливаем время
+        UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+        if (countdownText != null && !countdownText.gameObject.activeSelf)
+        {
+            countdownText.gameObject.SetActive(true); // Включаем текст снова
+        }// Перезапускаем текущую сцену
     }
 
-    // Показать экран завершения игры
-    public void ShowGameOver()
+    public void OnGameOver()
     {
-        gameCanvas.SetActive(false); // Скрыть игровой экран
-        gameOverCanvas.SetActive(true); // Показать экран окончания игры
+        gameOverMenu.SetActive(true);
+        Time.timeScale = 0f; // Останавливаем время
     }
 }

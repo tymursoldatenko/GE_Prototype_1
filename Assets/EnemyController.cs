@@ -16,6 +16,10 @@ public class NewBehaviourScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (!UIManager.isGameStarted)
+        {
+            return; // Выходим из метода Update, если игра ещё не началась
+        }
         enemyMesh.SetDestination(playerObj.position);
     }
 }
