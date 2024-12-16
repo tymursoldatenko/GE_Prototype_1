@@ -1,5 +1,6 @@
 using System.Collections; // Это важно для IEnumerator
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
@@ -18,6 +19,7 @@ public class UIManager : MonoBehaviour
 
     void Awake()
     {
+
         // Проверяем, если экземпляр уже существует, то удаляем этот компонент
         if (Instance != null && Instance != this)
         {
@@ -62,30 +64,32 @@ public class UIManager : MonoBehaviour
 
     public void OnStartButtonClicked()
     {
-        mainMenu.SetActive(false); // Скрываем главное меню
-        mainCamera.SetActive(false);
-        gameCamera.SetActive(true);
-        StartCoroutine(StartCountdown()); // Запускаем отсчёт
+        // Проверяем, существуют ли объекты, к которым мы пытаемся обратиться
+        if (mainMenu != null) mainMenu.SetActive(false); // Скрываем главное меню
+        if (mainCamera != null) mainCamera.SetActive(false);
+        if (gameCamera != null) gameCamera.SetActive(true);
+
+        // Запускаем отсчет
+        StartCoroutine(StartCountdown());
     }
+
 
     private IEnumerator StartCountdown()
     {
-        countdownUI.SetActive(true);
+        if (countdownUI != null) countdownUI.SetActive(true); // Показываем экран отсчета
 
         for (int i = 3; i > 0; i--)
         {
-            countdownText.text = i.ToString(); // Показать текущее число
-            yield return new WaitForSeconds(1f); // Ждать 1 секунду
+            if (countdownText != null) countdownText.text = i.ToString(); // Показать текущее число
+            yield return new WaitForSeconds(1f); // Ждем 1 секунду
         }
 
-        countdownText.text = "Go!";
+        if (countdownText != null) countdownText.text = "Go!"; // Показываем "Go!"
         yield return new WaitForSeconds(1f);
-        countdownText.text = "";
+        if (countdownText != null) countdownText.text = ""; // Очищаем текст
 
-        //countdownUI.SetActive(false); // Скрываем экран отсчёта
         isGameStarted = true; // Игра началась
     }
-
     public void OnPauseButtonClicked()
     {
         isGamePaused = true;
@@ -103,11 +107,37 @@ public class UIManager : MonoBehaviour
     public void OnRestartButtonClicked()
     {
         Time.timeScale = 1f; // Восстанавливаем время
-        UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
-        if (countdownText != null && !countdownText.gameObject.activeSelf)
-        {
-            countdownText.gameObject.SetActive(true); // Включаем текст снова
-        }// Перезапускаем текущую сцену
+
+        // Прячем все UI элементы перед перезагрузкой сцены
+        if (mainMenu != null) mainMenu.SetActive(false);
+        if (mainCamera != null) mainCamera.SetActive(false);
+        if (gameCamera != null) gameCamera.SetActive(false);
+        if (countdownUI != null) countdownUI.SetActive(false);
+        if (pauseMenu != null) pauseMenu.SetActive(false);
+        if (gameOverMenu != null) gameOverMenu.SetActive(false);
+
+        // Загружаем текущую сцену заново
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+
+        // После перезагрузки активируем необходимые UI элементы
+        StartCoroutine(WaitForSceneReload());
+    }
+
+    // Это корутина для того, чтобы подождать, пока сцена полностью загрузится
+    private IEnumerator WaitForSceneReload()
+    {
+        // Даем время для загрузки сцены
+        yield return new WaitForEndOfFrame();
+
+        // Проверяем на null и активируем нужные UI элементы
+        if (mainMenu != null) mainMenu.SetActive(true);
+        if (mainCamera != null) mainCamera.SetActive(true);
+        if (gameCamera != null) gameCamera.SetActive(false);
+        if (countdownUI != null) countdownUI.SetActive(false);
+        if (pauseMenu != null) pauseMenu.SetActive(false);
+        if (gameOverMenu != null) gameOverMenu.SetActive(false);
+
+        isGameStarted = false; // Игра не началась
     }
 
     public void OnGameOver()

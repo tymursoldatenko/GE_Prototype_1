@@ -37,6 +37,7 @@ public class InactivityTracker : MonoBehaviour
     void TriggerGameOver()
     {
         isGameOver = true; // Устанавливаем флаг гейм овер
-        UIManager.Instance.OnGameOver(); // Вызываем метод гейм овер в UIManager
+        UIManager.Instance.OnGameOver();
+        lastMovementTime = Time.time;// Вызываем метод гейм овер в UIManager
     }
 }

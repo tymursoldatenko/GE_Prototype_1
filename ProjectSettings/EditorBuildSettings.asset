@@ -5,7 +5,10 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Cars/ACC_Lite/Scenes/Demo.unity
     guid: 9789e29865be3414080f478abfc4aa71
+  - enabled: 1
+    path: Assets/Scenes/Map.unity
+    guid: 771f083250af03140b93780859b7e7ba
   m_configObjects: {}
